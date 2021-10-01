@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+import routes from "./routes";
 
 //Middleware
 const app = express();
@@ -18,9 +19,10 @@ app.use(cookieParser());
 import "./config/database";
 
 //Routes
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.json({ msg: "Bienvenido a la REST API" });
 });
+app.use("/api",routes.authRouter)
 
 //Server listening
 const PORT = process.env.PORT || 5000;
