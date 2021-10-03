@@ -3,7 +3,10 @@ import Users from "../models/userModel";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { generateActiveToken } from "../config/generateToken";
+import { validateEmail } from "../helpers";
+import sendEmail from "../config/sendMail";
 
+const URL_BASE = `${process.env.URL_BASE}`;
 const authCtrl = {
   register: async (req: Request, res: Response) => {
     try {
@@ -19,10 +22,13 @@ const authCtrl = {
         password: passwordHash,
         account,
       };
-      const active_token = generateActiveToken({newUser});
-      res
-        .status(200)
-        .json({ msg: "Register Successfully.", data: newUser, active_token });
+      const active_token = generateActiveToken({ newUser });
+      if (validateEmail(account)) {
+        sendEmail(account, URL_BASE, "Verify your email address");
+        res
+          .status(200)
+          .json({ msg: "Success! Please check your email", data: newUser, active_token });
+      }
     } catch (error) {
       return res.status(500).json({ msg: error });
     }
