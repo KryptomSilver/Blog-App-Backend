@@ -5,5 +5,6 @@ import { validateRegister } from "../middlewares/validate";
 const router = express.Router();
 
 router.post("/register", validateRegister, authCtrl.register);
+router.post("/active", authCtrl.activeAccount);
 
 export default router;
