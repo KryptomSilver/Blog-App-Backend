@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default:
-        "ttps://res.cloudinary.com/devatchannel/image/upload/v1602752402/avatar/avatar_cugq40.png",
+        "https://electronicssoftware.net/wp-content/uploads/user.png",
     },
     role: {
       type: String,
