@@ -117,11 +117,10 @@ const loginUser = async (user: IUser, password: string, res: Response) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
     res.json({
-      msg: "Login success!",
+      msg: 'Login Success!',
       access_token,
-      ...user._doc,
-      password: "",
-    });
+      user: { ...user._doc, password: '' }
+    })
   } catch (error) {
     console.log(error);
   }
