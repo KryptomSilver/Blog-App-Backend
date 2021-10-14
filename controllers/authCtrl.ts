@@ -50,15 +50,13 @@ const authCtrl = {
       const { newUser } = decoded;
       if (!newUser)
         return res.status(400).json({ msg: "Invalid authentication." });
-      const user = new Users(newUser);
-      await user.save();
+      const user = await Users.findOne({ account: newUser.account });
+      if (user) return res.status(400).json({ msg: "Account already exists." });
+      const new_user = new Users(newUser);
+      await new_user.save();
       res.json({ msg: "Account has been activated!" });
     } catch (error: any) {
-      let errorMsg;
-      if (error.code === 11000) {
-        errorMsg = Object.keys(error.keyValue)[0] + " already exists.";
-      }
-      return res.status(500).json({ msg: errorMsg });
+      return res.status(500).json({ msg: error.message });
     }
   },
   login: async (req: Request, res: Response) => {
