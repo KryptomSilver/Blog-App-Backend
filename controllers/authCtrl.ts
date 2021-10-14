@@ -10,9 +10,16 @@ import {
 import { validateEmail, validatePhone } from "../helpers";
 import { sendEmail } from "../config/sendEmail";
 import { sendSMS } from "../config/sendSMS";
-import { IDecodeToken, IUser } from "../interfaces/newUser";
+import {
+  IDecodeToken,
+  IGgPayload,
+  IUser,
+  IUserParams,
+} from "../interfaces/newUser";
+import { OAuth2Client } from "google-auth-library";
 
 const URL_BASE = `${process.env.URL_BASE}`;
+const client = new OAuth2Client(`${process.env.MAIL_CLIENT_ID}`);
 const authCtrl = {
   register: async (req: Request, res: Response) => {
     try {
@@ -100,6 +107,37 @@ const authCtrl = {
       return res.status(500).json({ msg: error.message });
     }
   },
+  googleLogin: async (req: Request, res: Response) => {
+    try {
+      const { id_token } = req.body;
+      const verify = await client.verifyIdToken({
+        idToken: id_token,
+        audience: `${process.env.MAIL_CLIENT_ID}`,
+      });
+      const { email, email_verified, name, picture } = <IGgPayload>(
+        verify.getPayload()
+      );
+      if (!email_verified)
+        return res.status(500).json({ msg: "Email verification failed" });
+      const password = email + "Your password google";
+      const passwordHash = await bcrypt.hash(password, 12);
+      const user = await Users.findOne({ account: email });
+      if (user) {
+        loginUser(user, password, res);
+      } else {
+        const user = {
+          name,
+          account: email,
+          password: passwordHash,
+          avatar: picture,
+          type: "login",
+        };
+        registerUser(user, res);
+      }
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
 };
 const loginUser = async (user: IUser, password: string, res: Response) => {
   try {
@@ -117,6 +155,26 @@ const loginUser = async (user: IUser, password: string, res: Response) => {
       msg: "Login Success!",
       access_token,
       user: { ...user._doc, password: "" },
+    });
+  } catch (error: any) {
+    return res.status(500).json({ msg: error.message });
+  }
+};
+const registerUser = async (user: IUserParams, res: Response) => {
+  try {
+    const newUser = new Users(user);
+    await newUser.save();
+    const access_token = generateAccessToken({ id: newUser._id });
+    const refresh_token = generateRefreshToken({ id: newUser._id });
+    res.cookie("refreshtoken", refresh_token, {
+      httpOnly: true,
+      path: "/api/refresh_token",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+    res.json({
+      msg: "Login Success!",
+      access_token,
+      user: { ...newUser._doc, password: "" },
     });
   } catch (error: any) {
     return res.status(500).json({ msg: error.message });
