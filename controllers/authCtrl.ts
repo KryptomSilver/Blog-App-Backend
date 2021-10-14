@@ -8,7 +8,7 @@ import {
   generateRefreshToken,
 } from "../config/generateToken";
 import { validateEmail, validatePhone } from "../helpers";
-import sendEmail from "../config/sendMail";
+import { sendEmail } from "../config/sendEmail";
 import { sendSMS } from "../config/sendSMS";
 import { IDecodeToken, IUser } from "../interfaces/newUser";
 
@@ -54,7 +54,6 @@ const authCtrl = {
       await user.save();
       res.json({ msg: "Account has been activated!" });
     } catch (error: any) {
-      console.log(error);
       let errorMsg;
       if (error.code === 11000) {
         errorMsg = Object.keys(error.keyValue)[0] + " already exists.";
@@ -117,10 +116,10 @@ const loginUser = async (user: IUser, password: string, res: Response) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
     res.json({
-      msg: 'Login Success!',
+      msg: "Login Success!",
       access_token,
-      user: { ...user._doc, password: '' }
-    })
+      user: { ...user._doc, password: "" },
+    });
   } catch (error) {
     console.log(error);
   }
