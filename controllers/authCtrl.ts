@@ -37,8 +37,8 @@ const authCtrl = {
         sendSMS(account, url, "Verify your phone number");
         res.status(200).json({ msg: "Success! Please check your phone" });
       }
-    } catch (error) {
-      return res.status(500).json({ msg: error });
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
     }
   },
   activeAccount: async (req: Request, res: Response) => {
@@ -66,8 +66,8 @@ const authCtrl = {
       if (!user)
         return res.status(404).json({ msg: "This account does not exists." });
       loginUser(user, password, res);
-    } catch (error) {
-      return res.status(500).json({ msg: error });
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
     }
   },
   logout: async (req: Request, res: Response) => {
@@ -95,9 +95,9 @@ const authCtrl = {
       if (!user)
         return res.status(400).json({ msg: "This account does not exist." });
       const access_token = generateAccessToken({ id: user._id });
-      res.json({ access_token });
-    } catch (error) {
-      return res.status(500).json({ msg: "hola" });
+      res.json({ access_token, user });
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
     }
   },
 };
@@ -118,8 +118,8 @@ const loginUser = async (user: IUser, password: string, res: Response) => {
       access_token,
       user: { ...user._doc, password: "" },
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    return res.status(500).json({ msg: error.message });
   }
 };
 
