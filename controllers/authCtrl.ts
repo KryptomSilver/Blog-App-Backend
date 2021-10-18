@@ -15,7 +15,7 @@ import {
   IGgPayload,
   IUser,
   IUserParams,
-} from "../interfaces/newUser";
+} from "../interfaces";
 import { OAuth2Client } from "google-auth-library";
 
 const URL_BASE = `${process.env.URL_BASE}`;
