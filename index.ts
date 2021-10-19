@@ -22,8 +22,9 @@ import "./config/database";
 app.get("/api", (req, res) => {
   res.json({ msg: "Bienvenido a la REST API" });
 });
-app.use("/api",routes.authRouter)
-app.use("/api",routes.userRouter)
+app.use("/api", routes.authRouter);
+app.use("/api", routes.userRouter);
+app.use("/api", routes.categoryRouter);
 
 //Server listening
 const PORT = process.env.PORT || 5000;
