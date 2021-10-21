@@ -89,7 +89,6 @@ const authCtrl = {
       const decoded = <IDecodeToken>(
         jwt.verify(rf_token, `${process.env.REFRESH_TOKEN_SECRET}`)
       );
-      console.log(typeof decoded.id);
       if (!decoded.id)
         return res.status(400).json({ msg: "Please login now!" });
 
