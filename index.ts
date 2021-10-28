@@ -25,6 +25,7 @@ app.get("/api", (req, res) => {
 app.use("/api", routes.authRouter);
 app.use("/api", routes.userRouter);
 app.use("/api", routes.categoryRouter);
+app.use("/api", routes.blogRouter);
 
 //Server listening
 const PORT = process.env.PORT || 5000;
