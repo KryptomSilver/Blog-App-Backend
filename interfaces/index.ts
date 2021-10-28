@@ -10,6 +10,15 @@ export interface IUser extends Document {
   type: string;
   _doc: object;
 }
+export interface IBlog extends Document {
+  user: string;
+  title: string;
+  content: string;
+  description: string;
+  thumbnail: string;
+  category: string;
+  _doc: object;
+}
 export interface newUser {
   name: string;
   account: string;
@@ -28,12 +37,12 @@ export interface IGgPayload {
   picture: string;
 }
 export interface IUserParams {
-  name:string
-  account: string
-  password: string
-  avatar?: string
-  type: string
+  name: string;
+  account: string;
+  password: string;
+  avatar?: string;
+  type: string;
 }
-export interface IReqAuth extends Request{
-  user?: IUser
+export interface IReqAuth extends Request {
+  user?: IUser;
 }
