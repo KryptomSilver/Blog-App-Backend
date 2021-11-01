@@ -112,7 +112,7 @@ const blogCtrl = {
               { $skip: skip },
               { $limit: limit },
             ],
-            totaCount: [
+            totalCount: [
               { $match: { category: idCategory } },
               { $count: "count" },
             ],
@@ -134,8 +134,7 @@ const blogCtrl = {
       } else {
         total = Math.floor(count / limit) + 1;
       }
-
-      res.json({ blogs, count });
+      res.json({ blogs, total });
     } catch (error: any) {
       return res.status(500).json({ msg: error.message });
     }
