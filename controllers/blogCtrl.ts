@@ -87,9 +87,9 @@ const blogCtrl = {
     const { limit, skip } = pagination(req);
     try {
       //Extract category id
-      const { id_category } = req.params;
+      const { id } = req.params;
       //Create object id category
-      const idCategory = new mongoose.Types.ObjectId(id_category);
+      const idCategory = new mongoose.Types.ObjectId(id);
       const Data = await Blogs.aggregate([
         {
           $facet: {
@@ -116,6 +116,59 @@ const blogCtrl = {
               { $match: { category: idCategory } },
               { $count: "count" },
             ],
+          },
+        },
+        {
+          $project: {
+            count: { $arrayElemAt: ["$totalCount.count", 0] },
+            totalData: 1,
+          },
+        },
+      ]);
+
+      const blogs = Data[0].totalData;
+      const count = Data[0].count;
+      let total = 0;
+      if (count % limit === 0) {
+        total = count / limit;
+      } else {
+        total = Math.floor(count / limit) + 1;
+      }
+      res.json({ blogs, total });
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
+  getBlogsByUser: async (req: Request, res: Response) => {
+    const { limit, skip } = pagination(req);
+    try {
+      //Extract category id
+      const { id } = req.params;
+      //Create object id category
+      const idCategory = new mongoose.Types.ObjectId(id);
+      const Data = await Blogs.aggregate([
+        {
+          $facet: {
+            totalData: [
+              { $match: { user: idCategory } }, //User
+              {
+                $lookup: {
+                  from: "users",
+                  let: { user_id: "$user" },
+                  pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", "$$user_id"] } } },
+                    { $project: { password: 0 } },
+                  ],
+                  as: "user",
+                },
+              },
+              { $unwind: "$user" },
+              //Sort
+              { $sort: { createdAt: -1 } },
+              { $skip: skip },
+              { $limit: limit },
+            ],
+            totalCount: [{ $match: { user: idCategory } }, { $count: "count" }],
           },
         },
         {
