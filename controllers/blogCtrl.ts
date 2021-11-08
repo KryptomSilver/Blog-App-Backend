@@ -192,6 +192,18 @@ const blogCtrl = {
       return res.status(500).json({ msg: error.message });
     }
   },
+  getBlog: async (req: Request, res: Response) => {
+    try {
+      const blog = await Blogs.findOne({ _id: req.params.id }).populate(
+        "user",
+        "-password"
+      );
+      if (!blog) return res.status(404).json({ msg: "Blog not found" });
+      res.json(blog);
+    } catch (error: any) {
+      return res.status(500).json({ msg: error.message });
+    }
+  },
 };
 
 export default blogCtrl;
