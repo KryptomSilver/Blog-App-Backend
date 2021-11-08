@@ -46,3 +46,12 @@ export interface IUserParams {
 export interface IReqAuth extends Request {
   user?: IUser;
 }
+export interface IComment extends Document {
+  user: string;
+  blog_id: string;
+  blog_user_id: string;
+  content: string;
+  replyCM: string[];
+  replyUser: string;
+  _doc: object;
+}
